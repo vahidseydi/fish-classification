@@ -18,11 +18,7 @@ from config import S3_BUCKET,S3_KEY,S3_SECRET, REGION
 
 
 
-s3_resource = boto3.resource(
-   "s3",
-   aws_access_key_id=S3_KEY,
-   aws_secret_access_key=S3_SECRET
-)
+s3_resource = boto3.resource("s3",aws_access_key_id=S3_KEY,aws_secret_access_key=S3_SECRET)
 
 region = REGION
 
@@ -89,17 +85,14 @@ def upload():
 
         # Save the file to .s3/<bucetname>/test
        
-        bucket_name = 'fish-classification-bucket'
         Key = 'test/{}'.format(secure_filename(f.filename))
-
-        s3 = boto3.resource('s3')       
-        s3.Bucket(bucket_name).put_object(Key=Key,Body=f)
+        s3_resource.Bucket(S3_BUCKET).put_object(Key=Key,Body=f)
         
         # Make prediction
        
 
         client=boto3.client('rekognition',region)
-        response = client.detect_labels(Image={'S3Object':{'Bucket':bucket_name,'Name':Key}},
+        response = client.detect_labels(Image={'S3Object':{'Bucket':S3_BUCKET,'Name':Key}},
         MaxLabels=10)
        
 
