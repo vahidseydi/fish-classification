@@ -16,6 +16,15 @@ from gevent.pywsgi import WSGIServer
 
 from config import S3_BUCKET,S3_KEY,S3_SECRET
 
+
+
+s3_resource = boto3.resource(
+   "s3",
+   aws_access_key_id=S3_KEY,
+   aws_secret_access_key=S3_SECRET
+)
+
+
 # Define a flask app
 application = Flask(__name__)
 app = application
