@@ -14,13 +14,12 @@ from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 #from gevent.pywsgi import WSGIServer
 
-from config import S3_BUCKET,S3_KEY,S3_SECRET, REGION
+from config import S3_BUCKET,S3_KEY,S3_SECRET
 
 
 
 s3_resource = boto3.resource("s3",aws_access_key_id=S3_KEY,aws_secret_access_key=S3_SECRET)
 
-region = REGION
 
 # Define a flask app
 application = Flask(__name__)
@@ -90,8 +89,8 @@ def upload():
         
         # Make prediction
        
-
-        client=boto3.client('rekognition',region)
+        '''
+        client=boto3.client('rekognition','eu-west-2')
         response = client.detect_labels(Image={'S3Object':{'Bucket':S3_BUCKET,'Name':Key}},
         MaxLabels=10)
        
@@ -99,6 +98,8 @@ def upload():
         print(str(len(response['Labels'])))
         result = get_result(response)               # Convert to string
         return result
+        '''
+        return "hello"
        
 
     return None
