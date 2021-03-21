@@ -14,6 +14,8 @@ from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 
+from config import S3_BUCKET,S3_KEY,S3_SECRET
+
 # Define a flask app
 application = Flask(__name__)
 app = application
