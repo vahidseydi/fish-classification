@@ -1,14 +1,109 @@
-from flask import Flask, request
+from __future__ import division, print_function
+# coding=utf-8
+import sys
+import os
+import glob
+import re
+import numpy as np
+import io
+import boto3
+import logging
+from botocore.exceptions import ClientError
+# Flask utils
+from flask import Flask, redirect, url_for, request, render_template
+from werkzeug.utils import secure_filename
+from gevent.pywsgi import WSGIServer
 
+# Define a flask app
 application = Flask(__name__)
+app = application
+# Model saved with Keras model.save()
+MODEL_PATH = 'models/model.h5'
 
-@application.route('/')
-def test():
-    return 'start'
+# Load your trained model
+#model = load_model(MODEL_PATH)
+ #model._make_predict_function()          # Necessary
+# print('Model loaded. Start serving...')
 
-if __name__ == "__main__":
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    application.debug = True
-    application.run()
 
+
+def model_predict(img_path, model):
+    return ""
+def get_result(response):
+    s=[]
+    s.append('Detected labels :' )
+    s.append("\n")
+    for label in response['Labels']:
+        s.append ("Label: " + label['Name'])
+        s.append("\n")
+        s.append ("Confidence: " + str(label['Confidence']))
+        s.append("\n")
+        s.append ("Instances:")
+        s.append("\n")
+        for instance in label['Instances']:
+            s.append ("  Bounding box")
+            s.append("\n")
+            s.append  ("    Top: " + str(instance['BoundingBox']['Top']))
+            s.append("\n")
+            s.append  ("    Left: " + str(instance['BoundingBox']['Left']))
+            s.append("\n")
+            s.append  ("    Width: " +  str(instance['BoundingBox']['Width']))
+            s.append("\n")
+            s.append  ("    Height: " +  str(instance['BoundingBox']['Height']))
+            s.append("\n")
+            s.append  ("  Confidence: " + str(instance['Confidence']))
+            s.append("\n")
+
+        s.append("\n")
+        s.append("Parents:")
+        for parent in label['Parents']:
+            s.append("   " + parent['Name'])
+        s.append ("----------")
+        s.append("\n")
+    return ''.join(s)
+
+
+@app.route('/', methods=['GET'])
+def index():
+    # Main page
+    return render_template('index.html')
+
+
+@app.route('/predict', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        # Get the file from post request
+        f = request.files['file']
+
+        # Save the file to .s3/<bucetname>/test
+       
+        bucket_name = 'fish-classification-bucket'
+        Key = 'test/{}'.format(secure_filename(f.filename))
+
+        s3 = boto3.resource('s3')       
+        s3.Bucket(bucket_name).put_object(Key=Key,Body=f)
+        
+        # Make prediction
+       
+
+        client=boto3.client('rekognition')
+        response = client.detect_labels(Image={'S3Object':{'Bucket':bucket_name,'Name':Key}},
+        MaxLabels=10)
+       
+
+        print(str(len(response['Labels'])))
+        result = get_result(response)               # Convert to string
+        return result
+       
+
+    return None
+
+
+if __name__ == '__main__':
+    # app.run(port=5002, debug=True)
+
+    # Serve the app with gevent
+    #http_server = WSGIServer(('', 5000), app)
+    #http_server.serve_forever()
+    app.debug=True
+    app.run()
