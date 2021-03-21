@@ -12,9 +12,9 @@ from botocore.exceptions import ClientError
 # Flask utils
 from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
-from gevent.pywsgi import WSGIServer
+#from gevent.pywsgi import WSGIServer
 
-from config import S3_BUCKET,S3_KEY,S3_SECRET
+from config import S3_BUCKET,S3_KEY,S3_SECRET, REGION
 
 
 
@@ -24,6 +24,7 @@ s3_resource = boto3.resource(
    aws_secret_access_key=S3_SECRET
 )
 
+region = REGION
 
 # Define a flask app
 application = Flask(__name__)
@@ -97,7 +98,7 @@ def upload():
         # Make prediction
        
 
-        client=boto3.client('rekognition')
+        client=boto3.client('rekognition',region)
         response = client.detect_labels(Image={'S3Object':{'Bucket':bucket_name,'Name':Key}},
         MaxLabels=10)
        
