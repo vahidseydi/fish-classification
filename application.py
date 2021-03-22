@@ -104,7 +104,7 @@ def upload():
 
     return None
 
-
+'''
 if __name__ == '__main__':
     # app.run(port=5002, debug=True)
 
@@ -113,3 +113,4 @@ if __name__ == '__main__':
     #http_server.serve_forever()
     app.debug=True
     app.run()
+'''
