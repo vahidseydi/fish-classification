@@ -18,7 +18,7 @@ from config import S3_BUCKET,S3_KEY,S3_SECRET
 
 
 
-s3_resource = boto3.resource("s3",aws_access_key_id=S3_KEY,aws_secret_access_key=S3_SECRET)
+s3 = boto3.resource('s3',aws_access_key_id=S3_KEY,aws_secret_access_key=S3_SECRET)
 
 
 # Define a flask app
@@ -83,7 +83,7 @@ def upload():
         f = request.files['file']
 
         # Save the file to .s3/<bucetname>/test
-       
+        s3_resource = boto3.resource('s3')
         Key = 'test/{}'.format(secure_filename(f.filename))
         s3_resource.Bucket(S3_BUCKET).put_object(Key=Key,Body=f)
         
